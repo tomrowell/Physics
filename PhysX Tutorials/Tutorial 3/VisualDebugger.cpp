@@ -205,6 +205,9 @@ namespace VisualDebugger
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(0, 1, 0)*gForceStrength * 30 * delta_time*timeMultiplier));
 			scene->SelectNextActor();
 			scene->SelectNextActor();
+			scene->SelectNextActor();
+			scene->SelectNextActor();
+			scene->SelectNextActor();
 			break;
 		default:
 			break;
@@ -291,10 +294,16 @@ namespace VisualDebugger
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(-1, 0, 0)*gForceStrength*delta_time));
 				scene->SelectNextActor();
 				scene->SelectNextActor();
+				scene->SelectNextActor();
+				scene->SelectNextActor();
+				scene->SelectNextActor();
 			break;
 		case 'L':
 				scene->SelectNextActor();
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(1, 0, 0)*gForceStrength*delta_time));
+				scene->SelectNextActor();
+				scene->SelectNextActor();
+				scene->SelectNextActor();
 				scene->SelectNextActor();
 				scene->SelectNextActor();
 			break;

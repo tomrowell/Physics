@@ -184,6 +184,9 @@ namespace PhysicsEngine
 		Plane* plane;
 		Box* paddle1;
 		Box* paddle2;
+		Box* motor1;
+		Box* motor2;
+		Box* motor3;
 		Sphere* ball;
 		stubbornBox* box3;
 		PxMaterial* rubber;
@@ -240,7 +243,7 @@ namespace PhysicsEngine
 			plane->Color(PxVec3(150.f/255.f,150.f/255.f,150.f/255.f));
 			Add(plane);
 
-			paddle1 = new Box(PxTransform(PxVec3(-15.0f,2.0f,-15.0f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, -1.f))), PxVec3(1.5f, 0.25f, 0.5f), PxReal(1000.0f));
+			paddle1 = new Box(PxTransform(PxVec3(-15.0f,2.0f,-15.0f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, -1.f))), PxVec3(1.5f, 0.25f, 0.5f), PxReal(500.0f));
 			paddle1->Color(PxVec3(0.0f / 255.f, 75.0f / 255.f, 0.0f / 255.f));
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
@@ -251,12 +254,27 @@ namespace PhysicsEngine
 			paddle1->Name("Paddle1");
 			Add(paddle1);			
 
-			paddle2 = new Box(PxTransform(PxVec3(15.0f, 2.0f, -15.0f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, 1.f))), PxVec3(1.5f, 0.25f, 0.5f), PxReal(1000.0f));
+			paddle2 = new Box(PxTransform(PxVec3(15.0f, 2.0f, -15.0f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, 1.f))), PxVec3(1.5f, 0.25f, 0.5f), PxReal(500.0f));
 			paddle2->Color(PxVec3(100.0f / 255.f, 0.0f / 255.f, 0.0f / 255.f));
 			paddle2->Name("Paddle2");
 			Add(paddle2);
 
-			ball = new Sphere(PxTransform(PxVec3(-15.0f, 25.0f, -15.0f)), PxReal(1.0f), PxReal(0.01f)); 
+			motor1 = new Box(PxTransform(PxVec3(0.0f, 20.0f, -15.0f)), PxVec3(1.5f, 0.25f, 1.5f), PxReal(1000.0f));
+			motor1->Color(PxVec3(0.0f / 255.f, 0.0f / 255.f, 100.0f / 255.f));
+			motor1->Name("Motor1");
+			Add(motor1);
+
+			motor2 = new Box(PxTransform(PxVec3(15.0f, 30.0f, -15.0f)), PxVec3(1.5f, 0.25f, 1.5f), PxReal(1000.0f));
+			motor2->Color(PxVec3(100.0f / 255.f, 100.0f / 255.f, 0.0f / 255.f));
+			motor2->Name("Motor2");
+			Add(motor2);
+
+			motor3 = new Box(PxTransform(PxVec3(-15.0f, 30.0f, -15.0f)), PxVec3(1.5f, 0.25f, 1.5f), PxReal(1000.0f));
+			motor3->Color(PxVec3(100.0f / 255.f, 0.0f / 255.f, 100.0f / 255.f));
+			motor3->Name("Motor3");
+			Add(motor3);
+
+			ball = new Sphere(PxTransform(PxVec3(-15.0f, 35.0f, -15.0f)), PxReal(1.0f), PxReal(0.01f)); 
 			rubber = GetPhysics()->createMaterial(0.25f, 0.25f, 1.0f);
 			ball->Material(rubber);
 			ball->Color(PxVec3(255.0f / 255.f, 255.0f / 255.f, 255.0f / 255.f));
@@ -297,6 +315,13 @@ namespace PhysicsEngine
 			D6 joint(NULL, PxTransform(PxVec3(-10.0f, 2.0f, 0.0f)), paddle1, PxTransform(PxVec3(0.f, 0.f, 15.f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, 1.f))));
 			D6 joint2(NULL, PxTransform(PxVec3(10.0f, 2.0f, 0.0f)), paddle2, PxTransform(PxVec3(0.f, 0.f, 15.f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, -1.f))));
 			D6 joint3(NULL, PxTransform(PxVec3(-10.0f, 2.0f, 0.0f)), ball, PxTransform(PxVec3(0.f, 0.f, 15.f)));
+
+			RevoluteJoint spin1(NULL, PxTransform(PxVec3(0.0f, 20.0f, -15.0f)), motor1, PxTransform(PxVec3(0.f, 0.f, 0.f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, 1.f))));
+			spin1.DriveVelocity(0.5f);
+			RevoluteJoint spin2(NULL, PxTransform(PxVec3(15.0f, 30.0f, -15.0f)), motor2, PxTransform(PxVec3(0.f, 0.f, 0.f), PxQuat(PxPi / 4, PxVec3(0.f, 0.f, 1.f))));
+			spin2.DriveVelocity(0.6f);
+			RevoluteJoint spin3(NULL, PxTransform(PxVec3(-15.0f, 30.0f, -15.0f)), motor3, PxTransform(PxVec3(0.f, 0.f, 0.f), PxQuat(PxPi / 16, PxVec3(0.f, 0.f, 1.f))));
+			spin3.DriveVelocity(0.7f);
 		}
 
 		//Custom udpate function
@@ -311,7 +336,7 @@ namespace PhysicsEngine
 				px_actor->setGlobalPose(PxTransform(paddle1Pos));*/
 
 			PxRigidDynamic* px_actor = (PxRigidDynamic*)ball->Get();
-			px_actor->addForce(PxVec3(0, 0.5, 0));
+			px_actor->addForce(PxVec3(0, 0.3, 0));
 			/*if(px_actor->getLinearVelocity().x > 0)
 				px_actor->addForce(PxVec3(-0.0, 0, 0));
 			else
@@ -321,13 +346,13 @@ namespace PhysicsEngine
 				if (px_actor->getGlobalPose().p.x > 0)
 				{
 					px_actor->setLinearVelocity(PxVec3(0, 0, 0));
-					px_actor->setGlobalPose(PxTransform(PxVec3(15.0f, 25.0f, -15.0f)));
+					px_actor->setGlobalPose(PxTransform(PxVec3(15.0f, 35.0f, -15.0f)));
 					SetScore(1);
 				}
 				else
 				{
 					px_actor->setLinearVelocity(PxVec3(0, 0, 0));
-					px_actor->setGlobalPose(PxTransform(PxVec3(-15.0f, 25.0f, -15.0f)));
+					px_actor->setGlobalPose(PxTransform(PxVec3(-15.0f, 35.0f, -15.0f)));
 					SetScore(2);
 				}
 		}
