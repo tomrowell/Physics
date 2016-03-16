@@ -36,7 +36,8 @@ namespace VisualDebugger
 	void ToggleRenderMode();
 	void HUDInit();
 
-	int timeMultiplier = 10;
+	//Variable that affects game speed
+	int timeMultiplier = 1;
 
 	///simulation objects
 	Camera* camera;
@@ -163,9 +164,11 @@ namespace VisualDebugger
 				hud.ActiveScreen(HELP);
 			hud.Clear();
 
+			//gets the score for both sides
 			scoreGreen = scene->GetScore(1);
 			scoreRed = scene->GetScore(2);
 
+			//writes the score in the HUD
 			hud.AddLine(HELP, "");
 			string currentScore = "   Score: " + to_string(scoreGreen) + " - " + to_string(scoreRed);
 			hud.AddLine(HELP, currentScore);
@@ -194,7 +197,7 @@ namespace VisualDebugger
 	{
 		switch (toupper(key))
 		{
-		//implement your own
+		//controls jumping for both paddles if they are on the ground
 		case 'W':
 			if (scene->GetSelectedActor()->getGlobalPose().p.y <= 2.5f)
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(0, 1, 0)*gForceStrength*30*delta_time*timeMultiplier));
@@ -267,28 +270,15 @@ namespace VisualDebugger
 
 		switch (toupper(key))
 		{
-			// Force controls on the selected actor
-		//case 'I': //forward
-		//	scene->GetSelectedActor()->addForce(PxVec3(0,0,-1)*gForceStrength);
-		//	break;
-		//case 'K': //backward
-		//	scene->GetSelectedActor()->addForce(PxVec3(0,0,1)*gForceStrength);
-		//	break;
+		//Force controls on the selected actor
+		
+		//controls the left and right movements for both paddles
 		case 'A': //left
-			//if (scene->GetSelectedActor()->getGlobalPose().p.x > -25)
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(-1, 0, 0)*gForceStrength*delta_time));
-			//else
-			//	scene->GetSelectedActor()->setLinearVelocity(PxVec3(0, 0, 0));
 			break;
 		case 'D': //right
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(1, 0, 0)*gForceStrength*delta_time));
 			break;
-		//case 'W': //up
-		//		scene->GetSelectedActor()->addForce(PxVec3(0,5,0)*gForceStrength);
-		//	break;
-		//case 'S': //down
-		//	scene->GetSelectedActor()->addForce(PxVec3(0,-1,0)*gForceStrength);
-		//	break;
 		case 'J':
 				scene->SelectNextActor();
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(-1, 0, 0)*gForceStrength*delta_time));

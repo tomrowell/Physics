@@ -212,6 +212,7 @@ namespace PhysicsEngine
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 		}
 
+		//sets the score for the requested team
 		void SetScore(int team)
 		{
 			if (team == 1)
@@ -220,6 +221,7 @@ namespace PhysicsEngine
 				scoreRed++;
 		}
 
+		//gets the score for the requested team
 		int GetScore(int team)
 		{
 			if (team == 1)
@@ -239,10 +241,12 @@ namespace PhysicsEngine
 			my_callback = new MySimulationEventCallback();
 			px_scene->setSimulationEventCallback(my_callback);
 
+			//plane
 			plane = new Plane();
 			plane->Color(PxVec3(150.f/255.f,150.f/255.f,150.f/255.f));
 			Add(plane);
 
+			//paddles
 			paddle1 = new Box(PxTransform(PxVec3(-15.0f,2.0f,-15.0f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, -1.f))), PxVec3(1.5f, 0.25f, 0.5f), PxReal(500.0f));
 			paddle1->Color(PxVec3(0.0f / 255.f, 75.0f / 255.f, 0.0f / 255.f));
 			//set collision filter flags
@@ -259,6 +263,7 @@ namespace PhysicsEngine
 			paddle2->Name("Paddle2");
 			Add(paddle2);
 
+			//spinning motor blocks
 			motor1 = new Box(PxTransform(PxVec3(0.0f, 20.0f, -15.0f)), PxVec3(1.5f, 0.25f, 1.5f), PxReal(1000.0f));
 			motor1->Color(PxVec3(0.0f / 255.f, 0.0f / 255.f, 100.0f / 255.f));
 			motor1->Name("Motor1");
@@ -274,13 +279,15 @@ namespace PhysicsEngine
 			motor3->Name("Motor3");
 			Add(motor3);
 
-			ball = new Sphere(PxTransform(PxVec3(-15.0f, 35.0f, -15.0f)), PxReal(1.0f), PxReal(0.01f)); 
+			//ball
+			ball = new Sphere(PxTransform(PxVec3(0.0f, 25.0f, -15.0f)), PxReal(1.0f), PxReal(0.01f));
 			rubber = GetPhysics()->createMaterial(0.25f, 0.25f, 1.0f);
 			ball->Material(rubber);
 			ball->Color(PxVec3(255.0f / 255.f, 255.0f / 255.f, 255.0f / 255.f));
 			ball->Name("Ball");
 			Add(ball);
 
+			//boundary blocks
 			box3 = new stubbornBox(PxTransform(PxVec3(0.0f, 5.75f, -15.0f)), PxVec3(0.25f, 5.0f, 1.0f), PxReal(1.0f));
 			box3->Color(PxVec3(50.0f/255.f, 50.0f/255.f, 50.0f/255.f));
 			box3->Name("Wall");
@@ -312,10 +319,13 @@ namespace PhysicsEngine
 			//and has the second object attached 5 meters away along the Y axis from the first object.
 			RevoluteJoint joint(box, PxTransform(PxVec3(0.f,0.f,0.f),PxQuat(PxPi/2,PxVec3(0.f,1.f,0.f))), box2, PxTransform(PxVec3(0.f,5.f,0.f)));
 			*/
+
+			//adds D6 joints to paddles and ball to lock rotation and travel in the z axis
 			D6 joint(NULL, PxTransform(PxVec3(-10.0f, 2.0f, 0.0f)), paddle1, PxTransform(PxVec3(0.f, 0.f, 15.f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, 1.f))));
 			D6 joint2(NULL, PxTransform(PxVec3(10.0f, 2.0f, 0.0f)), paddle2, PxTransform(PxVec3(0.f, 0.f, 15.f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, -1.f))));
 			D6 joint3(NULL, PxTransform(PxVec3(-10.0f, 2.0f, 0.0f)), ball, PxTransform(PxVec3(0.f, 0.f, 15.f)));
 
+			//adds spinning joints to motor blocks
 			RevoluteJoint spin1(NULL, PxTransform(PxVec3(0.0f, 20.0f, -15.0f)), motor1, PxTransform(PxVec3(0.f, 0.f, 0.f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, 1.f))));
 			spin1.DriveVelocity(0.5f);
 			RevoluteJoint spin2(NULL, PxTransform(PxVec3(15.0f, 30.0f, -15.0f)), motor2, PxTransform(PxVec3(0.f, 0.f, 0.f), PxQuat(PxPi / 4, PxVec3(0.f, 0.f, 1.f))));
@@ -335,6 +345,7 @@ namespace PhysicsEngine
 			}
 				px_actor->setGlobalPose(PxTransform(paddle1Pos));*/
 
+			//adds a force to counteract gravity slightly
 			PxRigidDynamic* px_actor = (PxRigidDynamic*)ball->Get();
 			px_actor->addForce(PxVec3(0, 0.3, 0));
 			/*if(px_actor->getLinearVelocity().x > 0)
@@ -342,6 +353,8 @@ namespace PhysicsEngine
 			else
 				px_actor->addForce(PxVec3(0.0, 0, 0));*/
 
+			//checks to see if the ball hits the floor
+			//changes score and places ball on a side depending on which team scored
 			if (px_actor->getGlobalPose().p.y < 1.8)
 				if (px_actor->getGlobalPose().p.x > 0)
 				{

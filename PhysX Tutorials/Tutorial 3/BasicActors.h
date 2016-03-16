@@ -48,6 +48,7 @@ namespace PhysicsEngine
 		}
 	};
 
+	//Static version of box
 	class stubbornBox : public StaticActor
 	{
 	public:
@@ -220,6 +221,7 @@ namespace PhysicsEngine
 		}
 	};
 
+	//D6 joint
 	class D6 : public Joint
 	{
 	public:
@@ -237,28 +239,4 @@ namespace PhysicsEngine
 			joint->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true);
 		}
 	};
-
-	/*class Mat : public PxPhysics
-	{
-	public:
-		PxMaterial* customMaterial;
-
-		Mat(PxReal staticFriction, PxReal dynamicFriction, PxReal restitution)
-		{
-			customMaterial = createMaterial(staticFriction, dynamicFriction, restitution);
-		}
-		PxMaterial* GetMat()
-		{
-			return customMaterial;
-		}
-	};
-
-	class Mat : public PxMaterial
-	{
-	public:
-		Mat(PxReal staticFriction, PxReal dynamicFriction, PxReal restitution)
-		{
-			PxPhysics phys = *GetPhysics();
-		}
-	};*/
 }
