@@ -189,17 +189,40 @@ namespace PhysicsEngine
 		PxMaterial* rubber;
 		MySimulationEventCallback* my_callback;
 
+	private:
+		int scoreGreen;
+		int scoreRed;
 
 	public:
 		//specify your custom filter shader here
 		//PxDefaultSimulationFilterShader by default
-		MyScene() : Scene() {};
+		MyScene() : Scene() 
+		{
+			scoreGreen = 0;
+			scoreRed = 0;
+		};
 
 		///A custom scene class
 		void SetVisualisation()
 		{
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+		}
+
+		void SetScore(int team)
+		{
+			if (team == 1)
+				scoreGreen++;
+			else
+				scoreRed++;
+		}
+
+		int GetScore(int team)
+		{
+			if (team == 1)
+				return scoreGreen;
+			else
+				return scoreRed;
 		}
 
 		//Custom scene initialisation
@@ -214,7 +237,7 @@ namespace PhysicsEngine
 			px_scene->setSimulationEventCallback(my_callback);
 
 			plane = new Plane();
-			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
+			plane->Color(PxVec3(150.f/255.f,150.f/255.f,150.f/255.f));
 			Add(plane);
 
 			paddle1 = new Box(PxTransform(PxVec3(-15.0f,2.0f,-15.0f), PxQuat(PxPi / 8, PxVec3(0.f, 0.f, -1.f))), PxVec3(1.5f, 0.25f, 0.5f), PxReal(1000.0f));
@@ -233,21 +256,36 @@ namespace PhysicsEngine
 			paddle2->Name("Paddle2");
 			Add(paddle2);
 
-			ball = new Sphere(PxTransform(PxVec3(-15.0f, 15.0f, -15.0f)), PxReal(1.0f), PxReal(0.01f)); 
+			ball = new Sphere(PxTransform(PxVec3(-15.0f, 25.0f, -15.0f)), PxReal(1.0f), PxReal(0.01f)); 
 			rubber = GetPhysics()->createMaterial(0.25f, 0.25f, 1.0f);
 			ball->Material(rubber);
 			ball->Color(PxVec3(255.0f / 255.f, 255.0f / 255.f, 255.0f / 255.f));
 			ball->Name("Ball");
 			Add(ball);
 
-			box3 = new stubbornBox(PxTransform(PxVec3(0.0f, 3.0f, -15.0f)), PxVec3(0.25f, 3.0f, 10.0f), PxReal(1.0f));
-			box3->Color(PxVec3(200.0f/255.f, 200.0f/255.f, 200.0f/255.f));
+			box3 = new stubbornBox(PxTransform(PxVec3(0.0f, 5.75f, -15.0f)), PxVec3(0.25f, 5.0f, 1.0f), PxReal(1.0f));
+			box3->Color(PxVec3(50.0f/255.f, 50.0f/255.f, 50.0f/255.f));
 			box3->Name("Wall");
 			Add(box3);
 
 			box3 = new stubbornBox(PxTransform(PxVec3(0.0f, 0.5f, -15.0f)), PxVec3(25.0f, 0.25f, 1.0f), PxReal(1.0f));
 			box3->Color(PxVec3(175.0f/255.f, 175.0f/255.f, 175.0f/255.f));
 			box3->Name("Floor");
+			Add(box3);
+
+			box3 = new stubbornBox(PxTransform(PxVec3(25.0f - 0.125f, 35.5f, -15.0f)), PxVec3(0.25f, 35.f, 1.0f), PxReal(1.0f));
+			box3->Color(PxVec3(175.0f / 255.f, 175.0f / 255.f, 175.0f / 255.f));
+			box3->Name("LeftFloor");
+			Add(box3);
+
+			box3 = new stubbornBox(PxTransform(PxVec3(-25.0f - 0.125f, 35.5f, -15.0f)), PxVec3(0.25f, 35.f, 1.0f), PxReal(1.0f));
+			box3->Color(PxVec3(175.0f / 255.f, 175.0f / 255.f, 175.0f / 255.f));
+			box3->Name("RightFloor");
+			Add(box3);
+
+			box3 = new stubbornBox(PxTransform(PxVec3(0.0f, 70.5f, -15.0f)), PxVec3(25.0f, 0.25f, 1.0f), PxReal(1.0f));
+			box3->Color(PxVec3(175.0f / 255.f, 175.0f / 255.f, 175.0f / 255.f));
+			box3->Name("TopFloor");
 			Add(box3);
 
 			/*
@@ -271,6 +309,27 @@ namespace PhysicsEngine
 				paddle1Pos.x = -30;
 			}
 				px_actor->setGlobalPose(PxTransform(paddle1Pos));*/
+
+			PxRigidDynamic* px_actor = (PxRigidDynamic*)ball->Get();
+			px_actor->addForce(PxVec3(0, 0.5, 0));
+			/*if(px_actor->getLinearVelocity().x > 0)
+				px_actor->addForce(PxVec3(-0.0, 0, 0));
+			else
+				px_actor->addForce(PxVec3(0.0, 0, 0));*/
+
+			if (px_actor->getGlobalPose().p.y < 1.8)
+				if (px_actor->getGlobalPose().p.x > 0)
+				{
+					px_actor->setLinearVelocity(PxVec3(0, 0, 0));
+					px_actor->setGlobalPose(PxTransform(PxVec3(15.0f, 25.0f, -15.0f)));
+					SetScore(1);
+				}
+				else
+				{
+					px_actor->setLinearVelocity(PxVec3(0, 0, 0));
+					px_actor->setGlobalPose(PxTransform(PxVec3(-15.0f, 25.0f, -15.0f)));
+					SetScore(2);
+				}
 		}
 
 		/// An example use of key release handling

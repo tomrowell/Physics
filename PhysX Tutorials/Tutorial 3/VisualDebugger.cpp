@@ -36,16 +36,21 @@ namespace VisualDebugger
 	void ToggleRenderMode();
 	void HUDInit();
 
+	int timeMultiplier = 10;
+
 	///simulation objects
 	Camera* camera;
 	PhysicsEngine::MyScene* scene;
-	PxReal delta_time = 1.f/60.f;
+	PxReal delta_time = 1.f/(60.f * timeMultiplier);
 	PxReal gForceStrength = 25;
 	RenderMode render_mode = NORMAL;
 	const int MAX_KEYS = 256;
 	bool key_state[MAX_KEYS];
 	bool hud_show = true;
 	HUD hud;
+
+	int scoreGreen;
+	int scoreRed;
 
 	//Init the debugger
 	void Init(const char *window_name, int width, int height)
@@ -61,7 +66,7 @@ namespace VisualDebugger
 		Renderer::InitWindow(window_name, width, height);
 		Renderer::Init();
 
-		camera = new Camera(PxVec3(0.0f, 10.0f, 15.0f), PxVec3(0.f,-.1f,-1.f), 5.f);
+		camera = new Camera(PxVec3(0.0f, 5.0f, 15.0f), PxVec3(0.f,0.35f,-1.f), 5.f);
 
 		//initialise HUD
 		HUDInit();
@@ -92,7 +97,7 @@ namespace VisualDebugger
 		//add an empty screen
 		hud.AddLine(EMPTY, "");
 		//add a help screen
-		hud.AddLine(HELP, " Simulation");
+		/*hud.AddLine(HELP, " Simulation");
 		hud.AddLine(HELP, "    F9 - select next actor");
 		hud.AddLine(HELP, "    F10 - pause");
 		hud.AddLine(HELP, "    F12 - reset");
@@ -108,12 +113,14 @@ namespace VisualDebugger
 		hud.AddLine(HELP, "    F8 - reset view");
 		hud.AddLine(HELP, "");
 		hud.AddLine(HELP, " Force (applied to the selected actor)");
-		hud.AddLine(HELP, "    I,K,J,L,U,M - forward,backward,left,right,up,down");
+		hud.AddLine(HELP, "    I,K,J,L,U,M - forward,backward,left,right,up,down");*/
 		//add a pause screen
+		/*hud.AddLine(PAUSE, "");
 		hud.AddLine(PAUSE, "");
 		hud.AddLine(PAUSE, "");
-		hud.AddLine(PAUSE, "");
-		hud.AddLine(PAUSE, "   Simulation paused. Press F10 to continue.");
+		hud.AddLine(PAUSE, "   Simulation paused. Press F10 to continue.");*/
+
+
 		//set font size for all screens
 		hud.FontSize(0.018f);
 		//set font color for all screens
@@ -154,6 +161,14 @@ namespace VisualDebugger
 				hud.ActiveScreen(PAUSE);
 			else
 				hud.ActiveScreen(HELP);
+			hud.Clear();
+
+			scoreGreen = scene->GetScore(1);
+			scoreRed = scene->GetScore(2);
+
+			hud.AddLine(HELP, "");
+			string currentScore = "   Score: " + to_string(scoreGreen) + " - " + to_string(scoreRed);
+			hud.AddLine(HELP, currentScore);
 		}
 		else
 			hud.ActiveScreen(EMPTY);
@@ -182,7 +197,14 @@ namespace VisualDebugger
 		//implement your own
 		case 'W':
 			if (scene->GetSelectedActor()->getGlobalPose().p.y <= 2.5f)
-				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(0, 1, 0)*gForceStrength*30*delta_time));
+				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(0, 1, 0)*gForceStrength*30*delta_time*timeMultiplier));
+			break;
+		case 'I':
+			scene->SelectNextActor();
+			if (scene->GetSelectedActor()->getGlobalPose().p.y <= 2.5f)
+				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(0, 1, 0)*gForceStrength * 30 * delta_time*timeMultiplier));
+			scene->SelectNextActor();
+			scene->SelectNextActor();
 			break;
 		default:
 			break;
@@ -250,10 +272,10 @@ namespace VisualDebugger
 		//	scene->GetSelectedActor()->addForce(PxVec3(0,0,1)*gForceStrength);
 		//	break;
 		case 'A': //left
-			if (scene->GetSelectedActor()->getGlobalPose().p.x > -25)
+			//if (scene->GetSelectedActor()->getGlobalPose().p.x > -25)
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(-1, 0, 0)*gForceStrength*delta_time));
-			else
-				scene->GetSelectedActor()->setLinearVelocity(PxVec3(0, 0, 0));
+			//else
+			//	scene->GetSelectedActor()->setLinearVelocity(PxVec3(0, 0, 0));
 			break;
 		case 'D': //right
 				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(1, 0, 0)*gForceStrength*delta_time));
@@ -264,6 +286,18 @@ namespace VisualDebugger
 		//case 'S': //down
 		//	scene->GetSelectedActor()->addForce(PxVec3(0,-1,0)*gForceStrength);
 		//	break;
+		case 'J':
+				scene->SelectNextActor();
+				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(-1, 0, 0)*gForceStrength*delta_time));
+				scene->SelectNextActor();
+				scene->SelectNextActor();
+			break;
+		case 'L':
+				scene->SelectNextActor();
+				scene->GetSelectedActor()->setLinearVelocity(scene->GetSelectedActor()->getLinearVelocity() + (PxVec3(1, 0, 0)*gForceStrength*delta_time));
+				scene->SelectNextActor();
+				scene->SelectNextActor();
+			break;
 		default:
 			break;
 		}
@@ -278,7 +312,7 @@ namespace VisualDebugger
 			//display control
 		case GLUT_KEY_F5:
 			//hud on/off
-			hud_show = !hud_show;
+			//hud_show = !hud_show;
 			break;
 		case GLUT_KEY_F6:
 			//shadows on/off
@@ -296,7 +330,7 @@ namespace VisualDebugger
 			//simulation control
 		case GLUT_KEY_F9:
 			//select next actor
-			scene->SelectNextActor();
+			//scene->SelectNextActor();
 			break;
 		case GLUT_KEY_F10:
 			//toggle scene pause
